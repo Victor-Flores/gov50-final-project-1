@@ -1,7 +1,7 @@
 ---
 title: "Gov 50 Final Project"
 author: "Victor Flores"
-description: "My final project"
+description: "Does cultural distance impact the willingness of Democratic countries to extend rights to noncitizens?"
 output:
   distill::distill_article:
     self_contained: false
@@ -9,9 +9,21 @@ output:
 
 
 
-## Project thoughts
+## Introduction
 
-I am interested in exploring data related to...
+Why do certain democracies allow noncitizens to vote while others don't? Absent global standards for the rights of noncitizens living in host countries different from those of their birth, democratic states have long been forced to grapple with the question of political inclusion. While many have slowly conferred rights enjoyed by citizens to their noncitizen populations, migrants are the remaining social group that democratic states actively discriminate against in the right to vote (Earnest 2006, 258). This is often the case despite democratic states imposing the burden of civic responsibility on their foreign-born populations, often in the form of taxes and military conscription (Earnest 2008, 18). This topic is of pressing interest because preventing noncitizen residents from voting presents a major challenge to democracy’s self-conception. Democratic states have a difficult task in affirming a normative argument for this restriction on the political rights of resident noncitizens.
+
+Noncitizen suffrage studies show a stronger correlative relationship between national factors over transnational factors and the expansion of voting rights to noncitizens (Earnest 2006; Kayran and Erdilmen 2021). The literature covers five leading national factors. The first is that democratic cultures that view the nation as a multicultural community appear more likely to enfranchise resident aliens than states whose citizens view the nation as an ethnic community (Earnest 2006, 263). Secondly, Partisan factors appear to make an impact in nonresident suffrage as left-wing parties are friendlier to nonresident causes. However, under conditions of more nonresident heterogeneity, right-wing governments appear to encourage enfranchisement, albeit by slower processes. Third: more restrictive immigration policy regimes, often instituted by right-wing governments, have been shown to increase the likelihood of enfranchisement, although not necessarily expediting the process. Additionally, the size of the foreign-born population is also a significant condition, as a lower share of foreign-born residents expedites enfranchisement regardless of partisanship. Fifth and perhaps most importantly, demographic heterogeneity is one of the key conditions in determining how quickly a nation may extend suffrage (Kayran and Erdilmen 2021, 2871). 
+
+David Earnest categorizes democracies based on their type of voting rights afforded to immigrants. The six categories are:
+
+States that offer no voting rights (0); rights granted by localities but not by the national government (1); local rights that discriminate on the basis of nationality (2); national rights that discriminate on the basis of nationality (3); local rights that are nondiscriminatory (4); and finally national rights that are nondiscriminatory (5). (Earnest 2006, 258)
+
+Earnest’s categorization can be used to explain the type of democratic inclusion, but his research does not make a direct connection between the aforementioned prevailing factors that incite noncitizen enfranchisement and the types of democratic inclusion that follow. I will focus on one factor, if the cultural distance of the immigrant population influences a democratic country's level of noncitizen inclusion. 
+
+To quantify cultural distance I will use Muthukrishna et al.'s cultural fixation index (CFst), pulling values from their data set derived from combined responses to the World Values Survey's 2005 and 2014 editions. They use a scale of 0 to 1 in which 0 is a culturally identical society and 1 is a maximally distant culture. The data of CFst values was downloaded from their website culturaldistance.com.
+
+# Data Download and Tidying
 
 ```{r}
 library(tidyverse)
@@ -23,6 +35,8 @@ cfst_data <-  read.csv("Data/download_matrix complete.csv")
 cfst_data$country <- c("Algeria", "Andorra", "Argentina", "Armenia", "Australia", "Azerbaijan", "Bahrain", "Belarus", "Brazil", "Bulgaria", "Burkina Faso", "Canada", "Chile", "China", "Colombia", "Cyprus", "Ecuador", "Egypt", "Estonia", "Ethiopia", "Finland", "France", "Georgia", "Germany", "Ghana", "Great Britain", "Guatemala", "Hong Kong", "Hungary", "India", "Indonesia", "Iran", "Iraq", "Italy", "Japan", "Jordan", "Kazakhstan", "Kuwait", "Kyrgyzstan", "Lebanon", "Libya", "Malaysia", "Mali", "Mexico", "Moldova", "Morocco", "Netherlands", "New Zealand", "Nigeria", "Norway", "Pakistan", "Palestine", "Peru", "Philippines", "Poland", "Qatar", "Romania", "Russia", "Rwanda", "Serbia and Montenegro", "Singapore", "Slovenia", "South Africa", "South Korea", "Spain", "Sweden", "Switzerland", "Taiwan", "Thailand", "Trinidad and Tobago", "Tunisia", "Turkey", "Ukraine", "United States", "Uruguay", "Uzbekistan", "Viet Nam", "Yemen", "Zambia", "Zimbabwe")
 
 ```
+
+# Comparison of Cultural Fixation Scores to the United States
 
 ```{r}
 us_data <- cfst_data |>
@@ -46,6 +60,7 @@ us_cfst_plot <- us_data |>
 us_cfst_plot
 ```
 
+# Statistically Significant Democratic Countries and their Rights Type (According to Earnest)
 ```{r}
 library(dplyr)
 democratic_countries <- cfst_data|>
@@ -53,6 +68,124 @@ democratic_countries <- cfst_data|>
 democratic_countries$rights_type <- c(0, 2, 1, 2, 2, 4, 2, 1, 3, 4, 2, 0, 2, 5, 4, 2, 2, 2, 4, 4, 1, 1, 5)
 rights_type_tibble <- democratic_countries |>
   select("country", "rights_type")
-rights_type_tibble
+
+knitr::kable(rights_type_tibble,
+             col.names = c("Country", "Rights Type")
+            )
 ```
+
+# Assessing Average Cultural Distance Among Rights Type 5 Countries
+
+```{r}
+new_zealand_tibble <- cfst_data |>
+  select("country", "New.Zealand2005.2014") |>
+  filter(country %in% c("Great Britain", "China", "India", "Australia", "South Africa", "South Korea", "United States"))
+
+knitr::kable(new_zealand_tibble,
+             col.names = c("Immigrant Sending Country to New Zealand", "Cultural Fixation Index Score"))
+
+mean(new_zealand_tibble$New.Zealand2005.2014)
+```
+
+```{r}
+uruguay_tibble <- cfst_data |>
+  select("country", "Uruguay2005.2014") |>
+  filter(country %in% c("Argentina", "Spain", "Brazil", "Italy", "Germany", "Chile", "Poland", "Paraguay", "United States", "Romania"))
+
+knitr::kable(uruguay_tibble,
+             col.names = c("Immigrant Sending Country to Uruguay", "Cultural Fixation Index Score"))
+
+mean(uruguay_tibble$Uruguay2005.2014)
+```
+
+# Assessing Average Cultural Distance Among Rights Type 0 Countries
+
+```{r}
+australia_tibble <- cfst_data |>
+  select("country", "Australia2005.2014") |>
+  filter(country %in% c("India", "China", "Great Britain", "Philippines", "Veit Nam", "New Zealand", "Pakistan", "South Africa", "Iraq", "Hong Kong"))
+
+knitr::kable(australia_tibble,
+             col.names = c("Immigrant Sending Country to Australia", "Cultural Fixation Index Score"))
+
+mean(australia_tibble$Australia2005.2014)
+```
+```{r}
+japan_tibble <- cfst_data |>
+  select("country", "Japan2005.2014") |>
+  filter(country %in% c("United States", "Peru", "Brazil", "Thailand", "Viet Nam", "Philippines", "China", "South Korea"))
+
+knitr::kable(japan_tibble,
+             col.names = c("Immigrant Sending Country to Japan", "Cultural Fixation Index Score"))
+
+mean(japan_tibble$Japan2005.2014)
+```
+
+```{r}
+cfst_immigration_calcs <- rights_type_tibble |>
+  filter(country %in% c("New Zealand", "Japan", "Uruguay", "Australia"))
+
+cfst_immigration_calcs$avg_cfst_among_immigrants <- c(0.141, 0.159, 0.102, 0.064) 
+
+knitr::kable(cfst_immigration_calcs,
+             col.names = c("Country", "Rights Type", "Average Cultural Fixation Index Score Among Immigrant Demographics"))
+```
+
+# Comparing Immigrant Cultural Distance Among Rights Type 0 and 5 Countries
+
+```{r}
+mean(0.141, 0.159)
+
+mean(0.102, 0.064)
+```
+
+```{r}
+data = matrix(c(0, 0.141, 5, 0.102), ncol = 2, byrow = TRUE)
+colnames(data) = c("rights_type", "average_immigrant_cfst")
+final = as.tibble(data)
+```
+
+```{r}
+final$rights_type <- as.character(final$rights_type)
+
+cfst_rights_plot <- ggplot(data = final, mapping = aes(x = rights_type,
+                                  y = average_immigrant_cfst)) +
+  geom_bar(stat = "identity", mapping = aes(fill = rights_type)) +
+  labs(title = "Average Immigrant Cultural Fixation Index Scores Among Rights Type
+       0 and 5 Democracies",
+       y = "Average CFst",
+       x = "Rights Type") +
+  theme_minimal()
+
+cfst_rights_plot
+```
+
+```{r}
+regression <- lm(rights_type ~ avg_cfst_among_immigrants, data = cfst_immigration_calcs)
+
+varnames1 <- c("(Intercept)" = "Intercept",
+               "avg_cfst_among_immigrants" = "Average CFst Among Immigrant Demographics")
+
+modelsummary::modelsummary(regression, statistic = "p.value",
+                           gof_map = c("nobs", "r.squared", "adj.r.squared"),
+                           coef_map = varnames1)
+```
+
+# Discussion
+This very crude statistical analysis implies a negative relationship between the average cultural fixation index score of a country's immigrants and the rights type of their democracy. Countries that receive immigrants that are culturally similar (closer to CFst 0) are more likely to score higher in Earnest's scale of noncitizen inclusion. New Zealand and Uruguay both receive more culturally homogeneous immigrants than Australia and Japan and boast an impressive rights type 5, allowing noncitizens to fully participate in elections at every level of government. On the other side of the extreme are Japan and Australia which do not allow noncitizens to participate democratically at any level of government (rights type 0). There can certainly be confounding variables such as the domestic population's view of immigrants. To make this analysis more substantive it would be necessary to not only investigate the extremes of Earnest's spectrum, but also those democratic countries in the middle of their level of inclusion. It could also be useful to somehow weigh the immigrant populations' CFst scores by the maginitude of their admitted population to a country. It would also be useful to include more robust data, such as the updated version of the World Values Survey and extending the survey to more countries to represent more sending countries.
+
+## Works Cited
+Muthukrishna, M., Bell, A. V., Henrich, J., Curtin, C. M., Gedranovich, A., McInerney, J., & Thue, B. (2020). Beyond Western, Educated, Industrial, Rich, and Democratic (WEIRD) Psychology: Measuring and Mapping Scales of Cultural and Psychological Distance. Psychological Science, 31(6), 678-701. https://doi.org/10.1177/0956797620916782
+
+Earnest, David C. “Neither Citizen Nor Stranger: Why States Enfranchise Resident Aliens.” World Politics, vol. 58, no. 2, 2006, pp. 242–75, https://doi.org/10.1353/wp.2006.0024.
+
+EVS/WVS (2022). European Values Study and World Values Survey: Joint EVS/WVS 2017-2022 Dataset (Joint EVS/WVS). GESIS Data Archive, Cologne. ZA7505. Dataset Version 4.0.0, doi:10.4232/1.14023
+
+https://www.migrationpolicy.org/article/its-population-ages-japan-quietly-turns-immigration
+
+https://www.statista.com/statistics/692815/asian-immigrant-stock-of-new-zealand-by-country-of-origin/
+
+https://www.statista.com/statistics/1272980/leading-countries-origin-migrants-uruguay/
+
+https://www.homeaffairs.gov.au/research-and-statistics/statistics/country-profiles/profiles#:~:text=%E2%80%8BThe%20top%2010%20countries,%E2%80%8BUnited%20Kingdom
 
